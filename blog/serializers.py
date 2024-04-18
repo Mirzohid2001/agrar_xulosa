@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Region, Seed, Fertiliser,Tractor,Worker,WorkType,Order,News
+from .models import Region, Seed, Fertiliser,Tractor,Worker,WorkType,Order,News,Review,Banner,Statistic
 
 
 class PlaceSerializer(serializers.ModelSerializer):
@@ -43,5 +43,23 @@ class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ('id', 'title', 'content','image')
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ('id','user','text','rate')
+
+class BannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Banner
+        fields = ('id','image','text')
+
+class StatisticSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Statistic
+        fields = ('count', 'created_at', 'updated_at')
+
+
+
 
 
