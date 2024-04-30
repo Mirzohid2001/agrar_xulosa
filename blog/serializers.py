@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Region, Seed, Fertiliser,Tractor,Worker,WorkType,Order,News,Review,Banner,Statistic
+from .models import Region, Seed, Fertiliser,Tractor,Worker,WorkType,Order,News,Review,Banner,Statistic,Legal_Documents
 
 
 class PlaceSerializer(serializers.ModelSerializer):
@@ -58,6 +58,12 @@ class StatisticSerializer(serializers.ModelSerializer):
     class Meta:
         model = Statistic
         fields = ('count', 'created_at', 'updated_at')
+
+class Legal_DocumentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Legal_Documents
+        fields = ('id', 'title', 'content','image')
+
 
 
 

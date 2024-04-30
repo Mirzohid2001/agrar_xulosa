@@ -1,13 +1,13 @@
 import os
 from django.db.models import Sum
 from openpyxl import Workbook
-from .models import Region, WorkType, Seed, Fertiliser, News, Review, Banner, Statistic
+from .models import Region, WorkType, Seed, Fertiliser, News, Review, Banner, Statistic,Legal_Documents
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import xlsxwriter
 
-from .serializers import NewsSerializer, ReviewSerializer, BannerSerializer
+from .serializers import NewsSerializer, ReviewSerializer, BannerSerializer,Legal_DocumentsSerializer
 
 import os
 import xlsxwriter
@@ -121,6 +121,10 @@ class BannerAPIView(generics.ListCreateAPIView):
     queryset = Banner.objects.all()
     serializer_class = BannerSerializer
 
+class Legal_DocumentsAPIView(generics.ListAPIView):
+    queryset = Legal_Documents.objects.all()
+    serializer_class = Legal_DocumentsSerializer
+
 
 
 class UserCountAPIView(APIView):
@@ -141,6 +145,8 @@ class UserCountAPIView(APIView):
         return Response({
             'total_users': total_users
         })
+
+
 
 
 

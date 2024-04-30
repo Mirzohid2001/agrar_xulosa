@@ -37,7 +37,7 @@ class LoginAPIView(APIView):
                     Token.objects.filter(user=user).delete()
                     token_key = get_random_string(length=40)
                     expires_at = timezone.now() + datetime.timedelta(weeks=1)
-                    token = Token.objects.create(key=token_key, user=user, expires_at=expires_at)
+                    token = Token.objects.create(key=token_key,  user=user,expires_at=expires_at)
 
                     return Response({'token': token.key}, status=status.HTTP_200_OK)
                 else:
