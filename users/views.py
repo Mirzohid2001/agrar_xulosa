@@ -38,8 +38,11 @@ class LoginAPIView(APIView):
                     token_key = get_random_string(length=40)
                     expires_at = timezone.now() + datetime.timedelta(weeks=1)
                     token = Token.objects.create(key=token_key,  user=user,expires_at=expires_at)
+                    serializer = UserSerializer(user).data
 
-                    return Response({'token': token.key}, status=status.HTTP_200_OK)
+                    return Response({'token': token.key,'user': serializer}, status=status.HTTP_200_OK)
+                    
+                
                 else:
                     return Response({'error': 'Неверный телефон или пароль.'}, status=status.HTTP_401_UNAUTHORIZED)
             except User.DoesNotExist:
