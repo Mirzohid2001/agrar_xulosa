@@ -1,12 +1,12 @@
 import os
 from django.db.models import Sum
 from openpyxl import Workbook
-from .models import Region, WorkType, Seed, Fertiliser, News, Review, Banner, Statistic,Legal_Documents
+from .models import Region, WorkType, Seed, Fertiliser, News, Review, Banner, Statistic, Legal_Documents
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import xlsxwriter
-from .serializers import NewsSerializer, ReviewSerializer, BannerSerializer,Legal_DocumentsSerializer
+from .serializers import NewsSerializer, ReviewSerializer, BannerSerializer, Legal_DocumentsSerializer
 import os
 import xlsxwriter
 from django.db.models import Sum
@@ -59,18 +59,16 @@ class DetailedCostBreakdownAPIView(APIView):
 
             total_cost_for_area = total_cost_per_hectare * area
 
-            # Создаем папку для сохранения файлов Excel, если она не существует
+
             excel_folder = "excel_files"
             if not os.path.exists(excel_folder):
                 os.makedirs(excel_folder)
 
-            # Генерируем уникальное имя файла на основе текущего времени и случайного числа
-            timestamp = str(int(time.time()))  # Текущее время в секундах
-            random_number = str(random.randint(1000, 9999))  # Случайное число от 1000 до 9999
+            timestamp = str(int(time.time()))
+            random_number = str(random.randint(1000, 9999))
             excel_file_name = f"detailed_cost_breakdown_{timestamp}_{random_number}.xlsx"
             excel_file_path = os.path.join(excel_folder, excel_file_name)
 
-            # Создаем файл Excel и записываем данные
             workbook = xlsxwriter.Workbook(excel_file_path)
             worksheet = workbook.add_worksheet("Detailed Cost Breakdown")
             header_format = workbook.add_format(
@@ -114,22 +112,25 @@ class NewsAPIView(generics.ListCreateAPIView):
     queryset = News.objects.all()
     serializer_class = NewsSerializer
 
+
 class NewsDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = News.objects.all()
     serializer_class = NewsSerializer
+
 
 class ReviewAPIView(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
+
 class BannerAPIView(generics.ListCreateAPIView):
     queryset = Banner.objects.all()
     serializer_class = BannerSerializer
 
+
 class Legal_DocumentsAPIView(generics.ListAPIView):
     queryset = Legal_Documents.objects.all()
     serializer_class = Legal_DocumentsSerializer
-
 
 
 class UserCountAPIView(APIView):
@@ -145,24 +146,9 @@ class UserCountAPIView(APIView):
             else:
                 statistic.count += 1
                 statistic.save()
-        registered_users_count = Statistic.objects.aggregate(total_registered_users=Sum('count'))['total_registered_users']
+        registered_users_count = Statistic.objects.aggregate(total_registered_users=Sum('count'))[
+            'total_registered_users']
 
         return Response({
             'total_users': total_users
         })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
