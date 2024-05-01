@@ -14,25 +14,12 @@ from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Region, Tractor, Worker, WorkType, Seed, Fertiliser, Order
+import os
+import time
+import random
 
 
 class DetailedCostBreakdownAPIView(APIView):
-    def get(self, request):
-        try:
-            regions = Region.objects.all().values_list('name', flat=True)
-            work_types = WorkType.objects.all().values_list('name', flat=True)
-            seeds = Seed.objects.all().values_list('name', flat=True)
-            fertilisers = Fertiliser.objects.all().values_list('name', flat=True)
-
-            return Response({
-                "regions": list(regions),
-                "work_types": list(work_types),
-                "seeds": list(seeds),
-                "fertilisers": list(fertilisers),
-            })
-        except Exception as e:
-            return Response({"error": str(e)}, status=400)
-
     def post(self, request):
         try:
             region_name = request.data.get('region')
@@ -71,11 +58,19 @@ class DetailedCostBreakdownAPIView(APIView):
             total_cost_per_hectare = worker_cost + tractor_cost_per_hectare + seed_cost_per_hectare + fertiliser_cost_per_hectare + fuel_cost_per_hectare
 
             total_cost_for_area = total_cost_per_hectare * area
+
+            # Создаем папку для сохранения файлов Excel, если она не существует
             excel_folder = "excel_files"
             if not os.path.exists(excel_folder):
                 os.makedirs(excel_folder)
-            excel_file_path = os.path.join(excel_folder, f"detailed_cost_breakdown_{region_name}.xlsx")
 
+            # Генерируем уникальное имя файла на основе текущего времени и случайного числа
+            timestamp = str(int(time.time()))  # Текущее время в секундах
+            random_number = str(random.randint(1000, 9999))  # Случайное число от 1000 до 9999
+            excel_file_name = f"detailed_cost_breakdown_{timestamp}_{random_number}.xlsx"
+            excel_file_path = os.path.join(excel_folder, excel_file_name)
+
+            # Создаем файл Excel и записываем данные
             workbook = xlsxwriter.Workbook(excel_file_path)
             worksheet = workbook.add_worksheet("Detailed Cost Breakdown")
             header_format = workbook.add_format(
@@ -113,9 +108,6 @@ class DetailedCostBreakdownAPIView(APIView):
             return Response({"error": "Один или несколько элементов не найдены."}, status=400)
         except ValueError:
             return Response({"error": "Предоставлены неверные данные."}, status=400)
-        except Exception as e:
-            return Response({"error": str(e)}, status=400)
-
 
 
 class NewsAPIView(generics.ListCreateAPIView):
