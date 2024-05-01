@@ -41,18 +41,31 @@ class DetailedCostBreakdownAPIView(APIView):
             work_type_name = request.data.get('work_type')
             seed_name = request.data.get('seed')
             fertiliser_name = request.data.get('fertiliser')
-            tractor_count = int(request.data.get('tractor_count'))
-            workers_count = int(request.data.get('workers_count'))
-            seed_quantity_per_hectare = float(request.data.get('seed_quantity_per_hectare'))
-            fertiliser_quantity_per_hectare = float(request.data.get('fertiliser_quantity_per_hectare'))
-            fuel_consumption_per_hectare = float(request.data.get('fuel_consumption_per_hectare'))
-            if not all([region_name, area_str, work_type_name, seed_name, fertiliser_name]):
+            tractor_count = request.data.get('tractor_count')
+            workers_count = request.data.get('workers_count')
+            seed_quantity_per_hectare = request.data.get('seed_quantity_per_hectare')
+            fertiliser_quantity_per_hectare = request.data.get('fertiliser_quantity_per_hectare')
+            fuel_consumption_per_hectare = request.data.get('fuel_consumption_per_hectare')
+
+
+            if not all([region_name, area_str, work_type_name, seed_name, fertiliser_name,
+                        tractor_count, workers_count, seed_quantity_per_hectare,
+                        fertiliser_quantity_per_hectare, fuel_consumption_per_hectare]):
                 return Response({"error": "Please provide all necessary data."}, status=400)
+
+
+            area = float(area_str)
+            tractor_count = int(tractor_count)
+            workers_count = int(workers_count)
+            seed_quantity_per_hectare = float(seed_quantity_per_hectare)
+            fertiliser_quantity_per_hectare = float(fertiliser_quantity_per_hectare)
+            fuel_consumption_per_hectare = float(fuel_consumption_per_hectare)
+
             region = Region.objects.get(name=region_name)
             work_type = WorkType.objects.get(place=region, name=work_type_name)
             seed = Seed.objects.get(place=region, name=seed_name)
             fertiliser = Fertiliser.objects.get(place=region, name=fertiliser_name)
-            area = float(area_str)
+
             worker_cost = workers_count * work_type.worker.salary
             tractor_cost_per_hectare = tractor_count * work_type.tractor.price_a_hectare
             seed_cost_per_hectare = seed_quantity_per_hectare * seed.price
