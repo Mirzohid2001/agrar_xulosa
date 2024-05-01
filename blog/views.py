@@ -6,24 +6,7 @@ from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import xlsxwriter
-
 from .serializers import NewsSerializer, ReviewSerializer, BannerSerializer,Legal_DocumentsSerializer
-
-import os
-import xlsxwriter
-from django.db.models import Sum
-from django.http import HttpResponse
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from .models import Region, Tractor, Worker, WorkType, Seed, Fertiliser, Order
-
-import os
-import xlsxwriter
-from django.db.models import Sum
-from django.http import HttpResponse
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from .models import Region, Tractor, Worker, WorkType, Seed, Fertiliser, Order
 import os
 import xlsxwriter
 from django.db.models import Sum
@@ -34,6 +17,22 @@ from .models import Region, Tractor, Worker, WorkType, Seed, Fertiliser, Order
 
 
 class DetailedCostBreakdownAPIView(APIView):
+    def get(self, request):
+        try:
+            regions = Region.objects.all().values_list('name', flat=True)
+            work_types = WorkType.objects.all().values_list('name', flat=True)
+            seeds = Seed.objects.all().values_list('name', flat=True)
+            fertilisers = Fertiliser.objects.all().values_list('name', flat=True)
+
+            return Response({
+                "regions": list(regions),
+                "work_types": list(work_types),
+                "seeds": list(seeds),
+                "fertilisers": list(fertilisers),
+            })
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
+
     def post(self, request):
         try:
             region_name = request.data.get('region')
@@ -47,12 +46,10 @@ class DetailedCostBreakdownAPIView(APIView):
             fertiliser_quantity_per_hectare = request.data.get('fertiliser_quantity_per_hectare')
             fuel_consumption_per_hectare = request.data.get('fuel_consumption_per_hectare')
 
-
             if not all([region_name, area_str, work_type_name, seed_name, fertiliser_name,
                         tractor_count, workers_count, seed_quantity_per_hectare,
                         fertiliser_quantity_per_hectare, fuel_consumption_per_hectare]):
-                return Response({"error": "Please provide all necessary data."}, status=400)
-
+                return Response({"error": "Пожалуйста, предоставьте все необходимые данные."}, status=400)
 
             area = float(area_str)
             tractor_count = int(tractor_count)
@@ -113,9 +110,12 @@ class DetailedCostBreakdownAPIView(APIView):
             return Response({"excel_file_path": excel_file_path})
 
         except (Region.DoesNotExist, WorkType.DoesNotExist, Seed.DoesNotExist, Fertiliser.DoesNotExist):
-            return Response({"error": "One or more items not found."}, status=400)
+            return Response({"error": "Один или несколько элементов не найдены."}, status=400)
         except ValueError:
-            return Response({"error": "Invalid data provided."}, status=400)
+            return Response({"error": "Предоставлены неверные данные."}, status=400)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
+
 
 
 class NewsAPIView(generics.ListCreateAPIView):
