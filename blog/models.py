@@ -78,14 +78,10 @@ class WorkType(models.Model):
         verbose_name_plural = 'Типы работы'
 
 class Order(models.Model):
-    tractor = models.ForeignKey(Tractor, on_delete=models.CASCADE, related_name='orders')
-    work_type = models.ForeignKey(WorkType, on_delete=models.CASCADE, related_name='orders')
-    area = models.FloatField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    excel_file = models.FileField(upload_to='excel_files/')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.tractor} - {self.area}"
 
     class Meta:
         verbose_name = 'Заказ'

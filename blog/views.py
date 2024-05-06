@@ -17,6 +17,9 @@ from .models import Region, Tractor, Worker, WorkType, Seed, Fertiliser, Order
 import os
 import time
 import random
+from django.conf import settings
+
+
 
 
 class DetailedCostBreakdownAPIView(APIView):
@@ -75,33 +78,30 @@ class DetailedCostBreakdownAPIView(APIView):
 
             total_cost_for_area = total_cost_per_hectare * area
 
-            # Создаем папку для сохранения файлов Excel, если она не существует
-            excel_folder = "excel_files"
+            excel_folder = os.path.join(settings.MEDIA_ROOT, "excel_files")
             if not os.path.exists(excel_folder):
                 os.makedirs(excel_folder)
 
-            # Генерируем уникальное имя файла на основе текущего времени и случайного числа
-            timestamp = str(int(time.time()))  # Текущее время в секундах
-            random_number = str(random.randint(1000, 9999))  # Случайное число от 1000 до 9999
+
+            timestamp = str(int(time.time()))
+            random_number = str(random.randint(1000, 9999))
             excel_file_name = f"detailed_cost_breakdown_{timestamp}_{random_number}.xlsx"
             excel_file_path = os.path.join(excel_folder, excel_file_name)
-
-            # Создаем файл Excel и записываем данные
             workbook = xlsxwriter.Workbook(excel_file_path)
             worksheet = workbook.add_worksheet("Detailed Cost Breakdown")
             header_format = workbook.add_format(
                 {'bold': True, 'align': 'center', 'valign': 'vcenter', 'text_wrap': True, 'border': 1})
             data_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'text_wrap': True, 'border': 1})
-            worksheet.write(0, 0, "Category", header_format)
-            worksheet.write(0, 1, "Cost Per Hectare", header_format)
-            worksheet.write(0, 2, "Total Cost For Given Area", header_format)
-            worksheet.write(0, 3, "Total Cost", header_format)
+            worksheet.write(0, 0, "Категория", header_format)
+            worksheet.write(0, 1, "Стоимость за гектар", header_format)
+            worksheet.write(0, 2, "Общая стоимость для указанной площади", header_format)
+            worksheet.write(0, 3, "Общая стоимость", header_format)
             additional_costs = {
-                "Worker Cost": worker_cost,
-                "Tractor Cost": tractor_cost_per_hectare,
-                "Seed Cost": seed_cost_per_hectare,
-                "Fertiliser Cost": fertiliser_cost_per_hectare,
-                "Fuel Cost": fuel_cost_per_hectare,
+                "Стоимость рабочего": worker_cost,
+                "Стоимость трактора": tractor_cost_per_hectare,
+                "Стоимость семян": seed_cost_per_hectare,
+                "Стоимость удобрений": fertiliser_cost_per_hectare,
+                "Стоимость топлива": fuel_cost_per_hectare,
             }
 
             row = 1
@@ -113,7 +113,7 @@ class DetailedCostBreakdownAPIView(APIView):
                 worksheet.write_number(row, 3, cost * area, data_format)
                 total_cost_all_positions += cost * area
                 row += 1
-            worksheet.write(row, 0, "Total Cost For All Positions", header_format)
+            worksheet.write(row, 0, "Общая стоимость по всем позициям", header_format)
             worksheet.write_number(row, 3, total_cost_all_positions, data_format)
 
             workbook.close()
@@ -124,6 +124,9 @@ class DetailedCostBreakdownAPIView(APIView):
             return Response({"error": "Один или несколько элементов не найдены."}, status=400)
         except ValueError:
             return Response({"error": "Предоставлены неверные данные."}, status=400)
+
+
+
 
 class NewsAPIView(generics.ListCreateAPIView):
     queryset = News.objects.all()
