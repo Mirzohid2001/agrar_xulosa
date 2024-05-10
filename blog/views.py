@@ -10,7 +10,7 @@ from .serializers import NewsSerializer, ReviewSerializer, BannerSerializer, Leg
 import os
 import xlsxwriter
 from django.db.models import Sum
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Region, Tractor, Worker, WorkType, Seed, Fertiliser, Order
@@ -18,8 +18,6 @@ import os
 import time
 import random
 from django.conf import settings
-
-
 
 
 class DetailedCostBreakdownAPIView(APIView):
@@ -82,7 +80,6 @@ class DetailedCostBreakdownAPIView(APIView):
             if not os.path.exists(excel_folder):
                 os.makedirs(excel_folder)
 
-
             timestamp = str(int(time.time()))
             random_number = str(random.randint(1000, 9999))
             excel_file_name = f"detailed_cost_breakdown_{timestamp}_{random_number}.xlsx"
@@ -118,14 +115,15 @@ class DetailedCostBreakdownAPIView(APIView):
 
             workbook.close()
 
-            return Response({"excel_file_path": excel_file_path})
+            # Генерация ссылки для скачивания файла
+            file_url = f"https://ustomirzohidn1.pythonanywhere.com/home/UstoMirzohidN1/agrar_xulosa/media/excel_files/{excel_file_name}"
+
+            return Response({"excel_file_url": file_url})
 
         except (Region.DoesNotExist, WorkType.DoesNotExist, Seed.DoesNotExist, Fertiliser.DoesNotExist):
             return Response({"error": "Один или несколько элементов не найдены."}, status=400)
         except ValueError:
             return Response({"error": "Предоставлены неверные данные."}, status=400)
-
-
 
 
 class NewsAPIView(generics.ListCreateAPIView):
